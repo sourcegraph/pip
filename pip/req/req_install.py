@@ -440,62 +440,64 @@ class InstallRequirement(object):
         return pp_toml
 
     def run_egg_info(self):
-        assert self.source_dir
-        if self.name:
-            logger.debug(
-                'Running setup.py (path:%s) egg_info for package %s',
-                self.setup_py, self.name,
-            )
-        else:
-            logger.debug(
-                'Running setup.py (path:%s) egg_info for package from %s',
-                self.setup_py, self.link,
-            )
-
-        with indent_log():
-            script = SETUPTOOLS_SHIM % self.setup_py
-            base_cmd = [sys.executable, '-c', script]
-            if self.isolated:
-                base_cmd += ["--no-user-cfg"]
-            egg_info_cmd = base_cmd + ['egg_info']
-            # We can't put the .egg-info files at the root, because then the
-            # source code will be mistaken for an installed egg, causing
-            # problems
-            if self.editable:
-                egg_base_option = []
-            else:
-                egg_info_dir = os.path.join(self.setup_py_dir, 'pip-egg-info')
-                ensure_dir(egg_info_dir)
-                egg_base_option = ['--egg-base', 'pip-egg-info']
-            call_subprocess(
-                egg_info_cmd + egg_base_option,
-                cwd=self.setup_py_dir,
-                show_stdout=False,
-                command_desc='python setup.py egg_info')
-
-        if not self.req:
-            if isinstance(parse_version(self.pkg_info()["Version"]), Version):
-                op = "=="
-            else:
-                op = "==="
-            self.req = Requirement(
-                "".join([
-                    self.pkg_info()["Name"],
-                    op,
-                    self.pkg_info()["Version"],
-                ])
-            )
-            self._correct_build_location()
-        else:
-            metadata_name = canonicalize_name(self.pkg_info()["Name"])
-            if canonicalize_name(self.req.name) != metadata_name:
-                logger.warning(
-                    'Running setup.py (path:%s) egg_info for package %s '
-                    'produced metadata for project name %s. Fix your '
-                    '#egg=%s fragments.',
-                    self.setup_py, self.name, metadata_name, self.name
-                )
-                self.req = Requirement(metadata_name)
+        logger.info("Skipping egg_info for package %s", self.name)
+        return
+        # assert self.source_dir
+        # if self.name:
+        #     logger.debug(
+        #         'Running setup.py (path:%s) egg_info for package %s',
+        #         self.setup_py, self.name,
+        #     )
+        # else:
+        #     logger.debug(
+        #         'Running setup.py (path:%s) egg_info for package from %s',
+        #         self.setup_py, self.link,
+        #     )
+        #
+        # with indent_log():
+        #     script = SETUPTOOLS_SHIM % self.setup_py
+        #     base_cmd = [sys.executable, '-c', script]
+        #     if self.isolated:
+        #         base_cmd += ["--no-user-cfg"]
+        #     egg_info_cmd = base_cmd + ['egg_info']
+        #     # We can't put the .egg-info files at the root, because then the
+        #     # source code will be mistaken for an installed egg, causing
+        #     # problems
+        #     if self.editable:
+        #         egg_base_option = []
+        #     else:
+        #         egg_info_dir = os.path.join(self.setup_py_dir, 'pip-egg-info')
+        #         ensure_dir(egg_info_dir)
+        #         egg_base_option = ['--egg-base', 'pip-egg-info']
+        #     call_subprocess(
+        #         egg_info_cmd + egg_base_option,
+        #         cwd=self.setup_py_dir,
+        #         show_stdout=False,
+        #         command_desc='python setup.py egg_info')
+        #
+        # if not self.req:
+        #     if isinstance(parse_version(self.pkg_info()["Version"]), Version):
+        #         op = "=="
+        #     else:
+        #         op = "==="
+        #     self.req = Requirement(
+        #         "".join([
+        #             self.pkg_info()["Name"],
+        #             op,
+        #             self.pkg_info()["Version"],
+        #         ])
+        #     )
+        #     self._correct_build_location()
+        # else:
+        #     metadata_name = canonicalize_name(self.pkg_info()["Name"])
+        #     if canonicalize_name(self.req.name) != metadata_name:
+        #         logger.warning(
+        #             'Running setup.py (path:%s) egg_info for package %s '
+        #             'produced metadata for project name %s. Fix your '
+        #             '#egg=%s fragments.',
+        #             self.setup_py, self.name, metadata_name, self.name
+        #         )
+        #         self.req = Requirement(metadata_name)
 
     def egg_info_data(self, filename):
         if self.satisfied_by is not None:
