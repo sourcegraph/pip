@@ -504,8 +504,8 @@ class RequirementSet(object):
                         'hash.' % req_to_install)
                 req_to_install.ensure_has_source_dir(self.src_dir)
                 req_to_install.update_editable(not self.is_download)
-                abstract_dist = make_abstract_dist(req_to_install)
-                abstract_dist.prep_for_dist()
+                # abstract_dist = make_abstract_dist(req_to_install)
+                # abstract_dist.prep_for_dist()
                 if self.is_download:
                     req_to_install.archive(self.download_dir)
                 req_to_install.check_if_exists()
@@ -516,7 +516,7 @@ class RequirementSet(object):
                         'package without checking its hash. To ensure a '
                         'completely repeatable environment, install into an '
                         'empty virtualenv.')
-                abstract_dist = Installed(req_to_install)
+                # abstract_dist = Installed(req_to_install)
             else:
                 # @@ if filesystem packages are not marked
                 # editable in a req, a non deterministic error
@@ -621,8 +621,8 @@ class RequirementSet(object):
                         'of HTTP error %s for URL %s' %
                         (req_to_install, exc, req_to_install.link)
                     )
-                abstract_dist = make_abstract_dist(req_to_install)
-                abstract_dist.prep_for_dist()
+                # abstract_dist = make_abstract_dist(req_to_install)
+                # abstract_dist.prep_for_dist()
                 if self.is_download:
                     # Make a .zip of the source_dir we already created.
                     if req_to_install.link.scheme in vcs.all_schemes:
@@ -656,61 +656,61 @@ class RequirementSet(object):
             # # parse dependencies # #
             # ###################### #
 
-            dist = abstract_dist.dist(finder)
-            try:
-                check_dist_requires_python(dist)
-            except UnsupportedPythonVersion as e:
-                if self.ignore_requires_python:
-                    logger.warning(e.args[0])
-                else:
-                    raise
-            more_reqs = []
+            # dist = abstract_dist.dist(finder)
+            # try:
+            #     check_dist_requires_python(dist)
+            # except UnsupportedPythonVersion as e:
+            #     if self.ignore_requires_python:
+            #         logger.warning(e.args[0])
+            #     else:
+            #         raise
+            # more_reqs = []
 
-            def add_req(subreq, extras_requested):
-                sub_install_req = InstallRequirement.from_req(
-                    str(subreq),
-                    req_to_install,
-                    isolated=self.isolated,
-                    wheel_cache=self._wheel_cache,
-                )
-                more_reqs.extend(self.add_requirement(
-                    sub_install_req, req_to_install.name,
-                    extras_requested=extras_requested))
+            # def add_req(subreq, extras_requested):
+            #     sub_install_req = InstallRequirement.from_req(
+            #         str(subreq),
+            #         req_to_install,
+            #         isolated=self.isolated,
+            #         wheel_cache=self._wheel_cache,
+            #     )
+            #     more_reqs.extend(self.add_requirement(
+            #         sub_install_req, req_to_install.name,
+            #         extras_requested=extras_requested))
+            #
+            # # We add req_to_install before its dependencies, so that we
+            # # can refer to it when adding dependencies.
+            # if not self.has_requirement(req_to_install.name):
+            #     # 'unnamed' requirements will get added here
+            #     self.add_requirement(req_to_install, None)
+            #
+            # if not ignore_dependencies:
+            #     if (req_to_install.extras):
+            #         logger.debug(
+            #             "Installing extra requirements: %r",
+            #             ','.join(req_to_install.extras),
+            #         )
+            #     missing_requested = sorted(
+            #         set(req_to_install.extras) - set(dist.extras)
+            #     )
+            #     for missing in missing_requested:
+            #         logger.warning(
+            #             '%s does not provide the extra \'%s\'',
+            #             dist, missing
+            #         )
+            #
+            #     available_requested = sorted(
+            #         set(dist.extras) & set(req_to_install.extras)
+            #     )
+            #     for subreq in dist.requires(available_requested):
+            #         add_req(subreq, extras_requested=available_requested)
+            #
+            # if not req_to_install.editable and not req_to_install.satisfied_by:
+            #     # XXX: --no-install leads this to report 'Successfully
+            #     # downloaded' for only non-editable reqs, even though we took
+            #     # action on them.
+            #     self.successfully_downloaded.append(req_to_install)
 
-            # We add req_to_install before its dependencies, so that we
-            # can refer to it when adding dependencies.
-            if not self.has_requirement(req_to_install.name):
-                # 'unnamed' requirements will get added here
-                self.add_requirement(req_to_install, None)
-
-            if not ignore_dependencies:
-                if (req_to_install.extras):
-                    logger.debug(
-                        "Installing extra requirements: %r",
-                        ','.join(req_to_install.extras),
-                    )
-                missing_requested = sorted(
-                    set(req_to_install.extras) - set(dist.extras)
-                )
-                for missing in missing_requested:
-                    logger.warning(
-                        '%s does not provide the extra \'%s\'',
-                        dist, missing
-                    )
-
-                available_requested = sorted(
-                    set(dist.extras) & set(req_to_install.extras)
-                )
-                for subreq in dist.requires(available_requested):
-                    add_req(subreq, extras_requested=available_requested)
-
-            if not req_to_install.editable and not req_to_install.satisfied_by:
-                # XXX: --no-install leads this to report 'Successfully
-                # downloaded' for only non-editable reqs, even though we took
-                # action on them.
-                self.successfully_downloaded.append(req_to_install)
-
-        return more_reqs
+        return []
 
     def cleanup_files(self):
         """Clean up files, remove builds."""
